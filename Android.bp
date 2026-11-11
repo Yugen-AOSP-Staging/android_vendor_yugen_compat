@@ -1,0 +1,74 @@
+//
+// Project Yugen -- LineageOS compatibility shim.
+// SPDX-License-Identifier: Apache-2.0
+//
+// Kernel header modules that LineageOS device trees and HALs expect.
+//
+// LineageOS defines these outside the platform, in places Yugen does not ship:
+//
+//   generated_kernel_headers  vendor/lineage/build/soong/Android.bp
+//                             a lineage_generator that runs `make
+//                             headers_install` on TARGET_KERNEL_SOURCE
+//   prebuilt_kernel_headers   same file, extracting
+//                             TARGET_PREBUILT_KERNEL_HEADERS
+//   generated_kernel_header_defaults / prebuilt_kernel_header_defaults
+//                             cc_defaults for the two above; also inherited
+//                             directly by hardware/qcom-caf/common's
+//                             audio/display/ipa header libraries
+//   device_kernel_headers     LineageOS's build/soong fork
+//
+// None of that exists on stock AOSP. The generator cannot be ported either: it
+// reads TARGET_KERNEL_SOURCE from Soong, and stock AOSP's board configuration
+// has no hook that exports it (LineageOS added one to its build/make). Yugen
+// keeps AOSP's build system, so these are plain header libraries exposing:
+//
+//   * AOSP's snapshotted kernel UAPI headers, via libc_headers. This covers
+//     <linux/*.h>, <sound/*.h>, <asm/*.h> and friends, which is all most
+//     callers need.
+//   * kernel-headers/include, a drop-in directory for device kernel headers
+//     (QTI display/audio, MediaTek techpack, ...) that AOSP does not carry.
+//     tools/link-kernel-headers.sh populates it from a synced kernel tree.
+//
+// See README.md#kernel-headers.
+//
+
+cc_defaults {
+    name: "generated_kernel_header_defaults",
+
+    header_libs: ["libc_headers"],
+    export_header_lib_headers: ["libc_headers"],
+
+    export_include_dirs: ["kernel-headers/include"],
+
+    vendor_available: true,
+    product_available: true,
+    recovery_available: true,
+}
+
+cc_defaults {
+    name: "prebuilt_kernel_header_defaults",
+
+    header_libs: ["libc_headers"],
+    export_header_lib_headers: ["libc_headers"],
+
+    export_include_dirs: ["kernel-headers/include"],
+
+    vendor_available: true,
+    product_available: true,
+    recovery_available: true,
+}
+
+cc_library_headers {
+    name: "generated_kernel_headers",
+    defaults: ["generated_kernel_header_defaults"],
+}
+
+cc_library_headers {
+    name: "prebuilt_kernel_headers",
+    defaults: ["prebuilt_kernel_header_defaults"],
+}
+
+cc_library_headers {
+    name: "device_kernel_headers",
+    defaults: ["generated_kernel_header_defaults"],
+}
