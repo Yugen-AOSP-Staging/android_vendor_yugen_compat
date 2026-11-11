@@ -15,9 +15,12 @@
 //                             cc_defaults for the two above; also inherited
 //                             directly by hardware/qcom-caf/common's
 //                             audio/display/ipa header libraries
-//   device_kernel_headers     LineageOS's build/soong fork
 //
-// None of that exists on stock AOSP. The generator cannot be ported either: it
+// device_kernel_headers is NOT defined here: AOSP has it since
+// build/soong/Android.bp became a kernel_headers module reading
+// TARGET_{DEVICE,BOARD,PRODUCT}_KERNEL_HEADERS.
+//
+// None of the rest exists on stock AOSP. The generator cannot be ported either: it
 // reads TARGET_KERNEL_SOURCE from Soong, and stock AOSP's board configuration
 // has no hook that exports it (LineageOS added one to its build/make). Yugen
 // keeps AOSP's build system, so these are plain header libraries exposing:
@@ -66,9 +69,4 @@ cc_library_headers {
 cc_library_headers {
     name: "prebuilt_kernel_headers",
     defaults: ["prebuilt_kernel_header_defaults"],
-}
-
-cc_library_headers {
-    name: "device_kernel_headers",
-    defaults: ["generated_kernel_header_defaults"],
 }

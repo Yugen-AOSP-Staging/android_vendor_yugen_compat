@@ -57,7 +57,12 @@ Several device trees and HALs ask for kernel headers by module name:
 | `prebuilt_kernel_headers` | same |
 | `generated_kernel_header_defaults` | same, also inherited by `hardware/qcom-caf/common` |
 | `prebuilt_kernel_header_defaults` | same |
-| `device_kernel_headers` | LineageOS's `build/soong` fork |
+
+`device_kernel_headers` is not in that list: AOSP has defined it in
+`build/soong/Android.bp` since it became a `kernel_headers` module, so it
+already exists on a stock platform and is left alone. It re-exports whatever
+`TARGET_DEVICE_KERNEL_HEADERS`, `TARGET_BOARD_KERNEL_HEADERS` and
+`TARGET_PRODUCT_KERNEL_HEADERS` point at.
 
 LineageOS's versions run `make headers_install` on `TARGET_KERNEL_SOURCE`
 through a `lineage_generator` Soong plugin. That plugin reads kernel variables
